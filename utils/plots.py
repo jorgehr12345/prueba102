@@ -118,6 +118,9 @@ class Annotator:
                 # modificaion
                 if "casco" in str(label):
                     if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
+                        print("Uso correcto")
+                    else:
+                        print("Se identificó un uso incorrecto")
                         label=label.replace("casco","uso incorrecto")
                 # fin modificacion
                 tf = max(self.lw - 1, 1)  # font thickness
