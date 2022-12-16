@@ -107,12 +107,13 @@ class Annotator:
                 print(str(lmList[0][2]))
             p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
             print("--------------------")
-            print("Coordenada 1_x: " + str(box[0]))
-            print("Coordenada 1_y: " + str(box[1]))
-            print("Coordenada 2_x: " + str(box[2]))
-            print("Coordenada 2_y: " + str(box[3]))
+            print("Coordenada 1_x: " + str(int(box[0])))
+            print("Coordenada 1_y: " + str(int(box[1])))
+            print("Coordenada 2_x: " + str(int(box[2])))
+            print("Coordenada 2_y: " + str(int(box[3])))
             print("--------------------")
             cv2.rectangle(self.im, p1, p2, color, thickness=self.lw, lineType=cv2.LINE_AA)
+            print("Etiqueta: " + str(label))
             if label:
                 tf = max(self.lw - 1, 1)  # font thickness
                 w, h = cv2.getTextSize(label, 0, fontScale=self.lw / 3, thickness=tf)[0]  # text width, height
