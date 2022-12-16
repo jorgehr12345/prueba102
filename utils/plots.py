@@ -102,19 +102,24 @@ class Annotator:
             img = detector.findPose(self.im,draw=False)
             lmList, bboxInfo = detector.findPosition(img,draw=False,bboxWithHands=False)
             if bboxInfo:
-                print(" asdasdasdasdasdas ")
-                print(str(lmList[0][1]))
-                print(str(lmList[0][2]))
+                print(" Coordenadas punto 1: ")
+                print(str(lmList[1][1]))
+                print(str(lmList[1][2]))
             p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
-            print("--------------------")
-            print("Coordenada 1_x: " + str(int(box[0])))
-            print("Coordenada 1_y: " + str(int(box[1])))
-            print("Coordenada 2_x: " + str(int(box[2])))
-            print("Coordenada 2_y: " + str(int(box[3])))
-            print("--------------------")
+            # print("--------------------")
+            # print("Coordenada 1_x: " + str(int(box[0])))
+            # print("Coordenada 1_y: " + str(int(box[1])))
+            # print("Coordenada 2_x: " + str(int(box[2])))
+            # print("Coordenada 2_y: " + str(int(box[3])))
+            # print("--------------------")
             cv2.rectangle(self.im, p1, p2, color, thickness=self.lw, lineType=cv2.LINE_AA)
             print("Etiqueta: " + str(label))
             if label:
+                # modificaion
+                if "casco" in str(label):
+                    if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
+                        label=label.replace("casco","uso incorrecto")
+                # fin modificacion
                 tf = max(self.lw - 1, 1)  # font thickness
                 w, h = cv2.getTextSize(label, 0, fontScale=self.lw / 3, thickness=tf)[0]  # text width, height
                 outside = p1[1] - h >= 3
