@@ -101,10 +101,7 @@ class Annotator:
         else:  # cv2
             img = detector.findPose(self.im,draw=False)
             lmList, bboxInfo = detector.findPosition(img,draw=False,bboxWithHands=False)
-            if bboxInfo:
-                print(" Coordenadas punto 1: ")
-                print(str(lmList[1][1]))
-                print(str(lmList[1][2]))
+            
             p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
             # print("--------------------")
             # print("Coordenada 1_x: " + str(int(box[0])))
@@ -117,11 +114,18 @@ class Annotator:
             if label:
                 # modificaion
                 if "casco" in str(label):
-                    if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
-                        print("Uso correcto")
+                    if bboxInfo:
+                        print(" Coordenadas punto 1: ")
+                        print(str(lmList[1][1]))
+                        print(str(lmList[1][2]))
+                        if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
+                            print("Uso correcto")
+                        else:
+                            print("Se identificó un uso incorrecto")
+                            label=label.replace("casco","uso incorrecto de casco")
                     else:
                         print("Se identificó un uso incorrecto")
-                        label=label.replace("casco","uso incorrecto")
+                        label=label.replace("casco","uso incorrecto de casco")
                 # fin modificacion
                 tf = max(self.lw - 1, 1)  # font thickness
                 w, h = cv2.getTextSize(label, 0, fontScale=self.lw / 3, thickness=tf)[0]  # text width, height
