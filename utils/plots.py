@@ -100,7 +100,7 @@ class Annotator:
                 self.draw.text((box[0], box[1] - h if outside else box[1]), label, fill=txt_color, font=self.font)
         else:  # cv2
             img = detector.findPose(self.im,draw=True)
-            lmList, bboxInfo = detector.findPosition(img,draw=False,bboxWithHands=False)
+            lmList, bboxInfo = detector.findPosition(img,draw=True,bboxWithHands=False)
             
             p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
             # print("--------------------")
