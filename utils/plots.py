@@ -99,6 +99,9 @@ class Annotator:
                 # self.draw.text((box[0], box[1]), label, fill=txt_color, font=self.font, anchor='ls')  # for PIL>8.0
                 self.draw.text((box[0], box[1] - h if outside else box[1]), label, fill=txt_color, font=self.font)
         else:  # cv2
+            print(" weqeqewqeqwe ")
+            print(self.im.shape)
+            print(" zxczcxzczczx ")
             self.im = detector.findPose(self.im,draw=True)
             lmList, bboxInfo = detector.findPosition(self.im,draw=True,bboxWithHands=False)
             
