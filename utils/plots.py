@@ -115,6 +115,7 @@ class Annotator:
                 # modificaion
                 if "casco" in str(label):
                     if bboxInfo:
+                        print("Se ha identificado a la persona")
                         print(" Coordenadas punto 1: ")
                         print(str(lmList[1][1]))
                         print(str(lmList[1][2]))
@@ -133,7 +134,9 @@ class Annotator:
                 p2 = p1[0] + w, p1[1] - h - 3 if outside else p1[1] + h + 3
                 cv2.rectangle(self.im, p1, p2, color, -1, cv2.LINE_AA)  # filled
                 cv2.putText(self.im,
-                            label, (p1[0], p1[1] - 2 if outside else p1[1] + h + 2),
+                            label,
+                            # (p1[0], p1[1] - 2 if outside else p1[1] + h + 2),
+                            (20,20),
                             0,
                             self.lw / 3,
                             txt_color,
