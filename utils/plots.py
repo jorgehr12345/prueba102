@@ -99,11 +99,11 @@ class Annotator:
                 # self.draw.text((box[0], box[1]), label, fill=txt_color, font=self.font, anchor='ls')  # for PIL>8.0
                 self.draw.text((box[0], box[1] - h if outside else box[1]), label, fill=txt_color, font=self.font)
         else:  # cv2
-            print(" weqeqewqeqwe ")
-            print(self.im.shape)
-            print(" zxczcxzczczx ")
-            self.im = detector.findPose(self.im,draw=True)
-            lmList, bboxInfo = detector.findPosition(self.im,draw=True,bboxWithHands=False)
+            # print(" weqeqewqeqwe ")
+            # print(self.im.shape)
+            # print(" zxczcxzczczx ")
+            # self.im = detector.findPose(self.im,draw=True)
+            # lmList, bboxInfo = detector.findPosition(self.im,draw=True,bboxWithHands=False)
             
             p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
             # print("--------------------")
@@ -113,33 +113,46 @@ class Annotator:
             # print("Coordenada 2_y: " + str(int(box[3])))
             # print("--------------------")
             cv2.rectangle(self.im, p1, p2, color, thickness=self.lw, lineType=cv2.LINE_AA)
-            print("Etiqueta: " + str(label))
+            # print("Etiqueta: " + str(label))
             if label:
                 # modificaion
-                if "casco" in str(label):
-                    if bboxInfo:
-                        print("Se ha identificado a la persona")
-                        print(" Coordenadas punto 1: ")
-                        print(str(lmList[1][1]))
-                        print(str(lmList[1][2]))
-                        if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
-                            print("Uso correcto")
-                        else:
-                            print("Se identificó un uso incorrecto")
-                            label=label.replace("casco","uso incorrecto de casco")
-                    else:
-                        print("Se identificó un uso incorrecto")
-                        label=label.replace("casco","uso incorrecto de casco")
+                # if "casco" in str(label):
+                #     if bboxInfo:
+                #         print("Se ha identificado a la persona")
+                #         print(" Coordenadas punto 1: ")
+                #         print(str(lmList[1][1]))
+                #         print(str(lmList[1][2]))
+                #         if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
+                #             print("Uso correcto")
+                #         else:
+                #             print("Se identificó un uso incorrecto")
+                #             label=label.replace("casco","uso incorrecto de casco")
+                #     else:
+                #         print("Se identificó un uso incorrecto")
+                #         label=label.replace("casco","uso incorrecto de casco")
                 # fin modificacion
                 tf = max(self.lw - 1, 1)  # font thickness
                 w, h = cv2.getTextSize(label, 0, fontScale=self.lw / 3, thickness=tf)[0]  # text width, height
                 outside = p1[1] - h >= 3
                 p2 = p1[0] + w, p1[1] - h - 3 if outside else p1[1] + h + 3
                 cv2.rectangle(self.im, p1, p2, color, -1, cv2.LINE_AA)  # filled
+                img=self.im
+                img = detector.findPose(img,draw=True)
+                lmList, bboxInfo = detector.findPosition(img,draw=True,bboxWithHands=False)
+                if "casco" in str(label):
+                    if bboxInfo:
+                        print("Hay una persona")
+                        print(" Coordenadas punto 1: ")
+                        print(str(lmList[1][1]))
+                        print(str(lmList[1][2]))
+                        if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
+                            print("Se está usando correctamente")
+                        else:
+                            print("Se identificó un uso incorrecto")
+                            label=label.replace("casco","uso incorrecto de casco")
+                
                 cv2.putText(self.im,
-                            label,
-                            (p1[0], p1[1] - 2 if outside else p1[1] + h + 2),
-                            # (20,20),
+                            label,(p1[0], p1[1] - 2 if outside else p1[1] + h + 2),
                             0,
                             self.lw / 8,
                             txt_color,
