@@ -30,7 +30,8 @@ from utils.segment.general import scale_image
 RANK = int(os.getenv('RANK', -1))
 matplotlib.rc('font', **{'size': 11})
 matplotlib.use('Agg')  # for writing to files only
-
+EPS=1e-8
+PI = math.acos(-1.0)
 
 class Colors:
     # Ultralytics color palette https://ultralytics.com/
@@ -69,6 +70,66 @@ def check_pil_font(font=FONT, size=10):
             return ImageFont.load_default()
 
 
+class Coordenadas:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+class Vector:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+def ccw(a,b,c):
+    dx1 = b.x - a.x
+    dx2 = c.x - b.x
+    dy1 = b.y - a.y
+    dy2 = c.y - b.y
+    t1 = dy2 * dx1
+    t2 = dy1 * dx2
+    if math.fabs(t1 - t2) < EPS:
+        if dx1 * dx2 < 0 or dy1 * dy2 < 0:
+            if dx1*dx1 + dy1*dy1 >= dx2*dx2 + dy2*dy2 - EPS:
+                return 2
+            else:
+                return 1
+        else:
+            return 0
+    if t1>t2:
+        return 0
+    return 1
+
+def direccion(a,b):
+    nuevo=Vector(0.0,0.0)
+    nuevo.x = b.x - a.x
+    nuevo.y = b.y - a.y
+    return nuevo
+
+def productoEscalar(a,b):
+    return a.x * b.x + a.y * b.y
+
+def moduloPot(a):
+    return a.x * a.x + a.y * a.y
+
+
+def angulo(a, o, b):
+    oa = direccion(o, a)
+    ob = direccion(o, b)
+    return math.acos(productoEscalar(oa, ob) / math.sqrt(moduloPot(oa) * moduloPot(ob)))
+
+def puntoEnPoligono(a,valores):
+    if len(valores) == 0:
+        return False
+
+    sum = 0.0
+    for i in range(0,len(valores)-1):
+        if (ccw(a, valores[i], valores[i + 1])) :
+            sum += angulo(valores[i], a, valores[i + 1])
+        else :
+            sum -= angulo(valores[i], a, valores[i + 1])
+        
+
+    return math.fabs(math.fabs(sum) - 2.0 * PI) < EPS
+
 class Annotator:
     # YOLOv5 Annotator for train/val mosaics and jpgs and detect/hub inference annotations
     def __init__(self, im, line_width=None, font_size=None, font='Arial.ttf', pil=False, example='abc'):
@@ -99,11 +160,6 @@ class Annotator:
                 # self.draw.text((box[0], box[1]), label, fill=txt_color, font=self.font, anchor='ls')  # for PIL>8.0
                 self.draw.text((box[0], box[1] - h if outside else box[1]), label, fill=txt_color, font=self.font)
         else:  # cv2
-            # print(" weqeqewqeqwe ")
-            # print(self.im.shape)
-            # print(" zxczcxzczczx ")
-            # self.im = detector.findPose(self.im,draw=True)
-            # lmList, bboxInfo = detector.findPosition(self.im,draw=True,bboxWithHands=False)
             
             p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
             # print("--------------------")
@@ -115,22 +171,6 @@ class Annotator:
             cv2.rectangle(self.im, p1, p2, color, thickness=self.lw, lineType=cv2.LINE_AA)
             # print("Etiqueta: " + str(label))
             if label:
-                # modificaion
-                # if "casco" in str(label):
-                #     if bboxInfo:
-                #         print("Se ha identificado a la persona")
-                #         print(" Coordenadas punto 1: ")
-                #         print(str(lmList[1][1]))
-                #         print(str(lmList[1][2]))
-                #         if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
-                #             print("Uso correcto")
-                #         else:
-                #             print("Se identificó un uso incorrecto")
-                #             label=label.replace("casco","uso incorrecto de casco")
-                #     else:
-                #         print("Se identificó un uso incorrecto")
-                #         label=label.replace("casco","uso incorrecto de casco")
-                # fin modificacion
                 tf = max(self.lw - 1, 1)  # font thickness
                 w, h = cv2.getTextSize(label, 0, fontScale=self.lw / 3, thickness=tf)[0]  # text width, height
                 outside = p1[1] - h >= 3
@@ -141,15 +181,28 @@ class Annotator:
                 lmList, bboxInfo = detector.findPosition(img,draw=True,bboxWithHands=False)
                 if "casco" in str(label):
                     if bboxInfo:
+                        puntos=[]
+                        puntos.append(Coordenadas(float(box[0]),float(box[1])))
+                        puntos.append(Coordenadas(float(box[0]),float(box[3])))
+                        puntos.append(Coordenadas(float(box[2]),float(box[3])))
+                        puntos.append(Coordenadas(float(box[2]),float(box[1])))
+                        puntos.append(Coordenadas(float(box[0]),float(box[1])))
+
                         print("Hay una persona")
                         print(" Coordenadas punto 1: ")
-                        print(str(lmList[1][1]))
-                        print(str(lmList[1][2]))
-                        if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
-                            print("Se está usando correctamente")
-                        else:
-                            print("Se identificó un uso incorrecto")
-                            label=label.replace("casco","uso incorrecto de casco")
+                        for i in range(10):
+                            if puntoEnPoligono(Coordenadas(float(lmList[i][1]),float(lmList[i][2])),puntos)==True:
+                                print("Se está usando correctamente")
+                            else:
+                                print("Se identificó un uso incorrecto")
+                                label=label.replace("casco","uso incorrecto de casco")  
+                        # print(str(lmList[1][1]))
+                        # print(str(lmList[1][2]))
+                        # if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
+                        #     print("Se está usando correctamente")
+                        # else:
+                        #     print("Se identificó un uso incorrecto")
+                        #     label=label.replace("casco","uso incorrecto de casco")
                 
                 cv2.putText(self.im,
                             label,(p1[0], p1[1] - 2 if outside else p1[1] + h + 2),
