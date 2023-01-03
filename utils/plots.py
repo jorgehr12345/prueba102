@@ -192,13 +192,14 @@ class Annotator:
                         print(" Coordenadas punto 1: ")
                         a=False
                         for i in range(10):
-                            if puntoEnPoligono(Coordenadas(float(lmList[i][1]),float(lmList[i][2])),puntos)==False:
-                                print("Se identificó un uso incorrecto")
-                                label=label.replace("casco","uso incorrecto de casco")
+                            if puntoEnPoligono(Coordenadas(float(lmList[i][1]),float(lmList[i][2])),puntos)==True:
                                 a=True
+                                print("Uso correcto de casco")
                                 break
+                                
                         if a==False:
-                            print("Uso correcto de casco")
+                            print("Se identificó un uso incorrecto")
+                            label=label.replace("casco","uso incorrecto de casco")
                         # print(str(lmList[1][1]))
                         # print(str(lmList[1][2]))
                         # if (int(lmList[1][1])>=min(int(box[0]),int(box[2])) and int(lmList[1][1])<=max(int(box[0]),int(box[2])) ) or (int(lmList[1][2])>=min(int(box[1]),int(box[3])) and int(lmList[1][2])<=max(int(box[1]),int(box[3])) ):
